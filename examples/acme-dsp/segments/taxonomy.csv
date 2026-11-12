@@ -1,0 +1,6 @@
+segment_id,name,source
+1001,Interest > Running,contextual+behavioural
+1002,Interest > Home improvement,behavioural
+1003,In-market > Family cars,behavioural
+1004,Health > Diabetes management,behavioural
+1005,Lifestyle > Travel enthusiasts,behavioural

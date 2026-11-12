@@ -1,0 +1,19 @@
+[project]
+name = "privacy-attest"
+version = "0.2.0"
+description = "Member-run privacy review agent with signed attestations. Prototype."
+requires-python = ">=3.10"
+dependencies = ["click>=8", "pyyaml>=6", "cryptography>=41"]
+
+[project.scripts]
+privacy-attest = "privacy_attest.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["privacy_attest"]
+
+[tool.setuptools.package-data]
+privacy_attest = ["ruleset/*.yaml"]

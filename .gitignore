@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.attest/
+examples/acme/privacy-review/
+examples/acme/*/.git/
+examples/acme/acme-submission.json
+examples/acme/acme-member-key.pub.pem
+examples/acme/reveal-*.json
+*.pem

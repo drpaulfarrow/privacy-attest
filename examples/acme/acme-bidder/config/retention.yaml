@@ -1,0 +1,5 @@
+# Data retention settings
+bid_logs:
+  ttl_days: 90
+raw_request_logs:
+  retention_days: 30

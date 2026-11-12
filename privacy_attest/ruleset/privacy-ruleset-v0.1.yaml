@@ -1,0 +1,73 @@
+# Privacy review ruleset, version 0.1 (prototype)
+#
+# Each question maps a Privacy Review question to signals the agent looks for
+# in a member's own code and configuration. Counsel owns the wording and the
+# legal references; engineering owns the signals. The ruleset is published and
+# its digest is recorded in every attestation, so an answer can always be traced
+# to the exact rules that produced it.
+
+version: "0.1"
+published: "2026-11-11"
+
+questions:
+
+  - id: Q1
+    key: gpc_honoured
+    framework_area: Choice and consumer control
+    text: >
+      When a browser sends a Global Privacy Control signal, do your systems stop
+      selling or sharing that person's data with third parties (tags, pixels,
+      beacons, bid requests)?
+    legal_refs: ["CCPA regs 7025 (opt-out preference signals)", "CO CPA universal opt-out", "NJ, CT, TX, OR and others"]
+    evaluator: gpc_gating
+    signals:
+      gpc_read: '(?i)(sec-gpc|globalPrivacyControl|\bgpc\b)'
+      third_party_call: '(?i)(sendBeacon\(|\.src\s*=\s*["''`]https?://|fetch\(\s*["''`]https?://|requests\.(post|get)\(|httpx\.(post|get)\()'
+      gate_hint: '(?i)\bif\b.*(gpc|opt_?out|optedOut|doNotSell|do_not_sell|canShare|can_share|sale_allowed)'
+    gate_window_lines: 12
+
+  - id: Q2
+    key: precise_geolocation
+    framework_area: Sensitive personal data
+    text: >
+      Do you collect or use precise geolocation (finer than roughly 1.85 km,
+      the usual statutory threshold)?
+    legal_refs: ["CCPA 1798.140(ae) precise geolocation", "VA, CO, CT sensitive data definitions"]
+    evaluator: precise_geo
+    signals:
+      browser_geo: '(?i)(navigator\.geolocation|getCurrentPosition|watchPosition)'
+      coordinates: '(?i)(\blat(itude)?\b|\blon(gitude)?\b|\blng\b)'
+      coarsening: '(?i)(round\([^)]*,\s*[0-2]\s*\)|toFixed\(\s*[0-2]\s*\)|geohash.{0,20}[1-5]\b|coarsen)'
+
+  - id: Q3
+    key: sensitive_segments
+    framework_area: Sensitive personal data
+    text: >
+      Do you create or activate audience segments based on sensitive categories
+      such as health conditions, sexual orientation, religion or precise location?
+    legal_refs: ["Industry self-regulatory guidance on health-related data", "State sensitive data opt-in rules"]
+    evaluator: sensitive_segments
+    path_hint: '(?i)(segment|taxonomy|audience)'
+    signals:
+      sensitive_term: '(?i)(health|diabet|cancer|pregnan|fertility|hiv|mental|depress|anxiety|addiction|sexual|lgbt|gay|religio|christian|muslim|jewish|immigra|union member|political)'
+
+  - id: Q4
+    key: retention_limit
+    framework_area: Data governance
+    text: >
+      Do you set a retention limit for user-level event data, and what is the
+      longest one?
+    legal_refs: ["CCPA 1798.100(a)(3) retention disclosure", "Data minimisation duties in CO, CT, MD"]
+    evaluator: retention
+    signals:
+      retention: '(?i)(retention|ttl|expire|expiry|max_age)[a-z_]*\s*[:=]\s*(\d+)\s*(d|days?)?'
+
+  - id: Q5
+    key: third_party_recipients
+    framework_area: Transparency
+    text: >
+      Which third parties receive personal data from your systems?
+    legal_refs: ["CCPA 1798.110 categories of third parties", "Industry self-regulatory transparency principles"]
+    evaluator: recipients
+    signals:
+      url: 'https?://([a-z0-9.-]+\.[a-z]{2,})'
